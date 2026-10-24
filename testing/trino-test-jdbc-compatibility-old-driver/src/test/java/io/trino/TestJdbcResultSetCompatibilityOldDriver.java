@@ -14,8 +14,8 @@
 package io.trino;
 
 import io.trino.jdbc.TestJdbcResultSet;
-import org.testng.SkipException;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assumptions;
 
 import java.util.Optional;
 
@@ -30,9 +30,11 @@ public class TestJdbcResultSetCompatibilityOldDriver
     @Test
     public void ensureProperTestVersionLoaded()
     {
-        if (VERSION_UNDER_TEST.isEmpty()) {
-            throw new SkipException("Information about JDBC version under test is missing");
-        }
+        Assumptions.assumeTrue(
+        VERSION_UNDER_TEST.isPresent(),
+        "Information about JDBC version under test is missing"
+        );
+
 
         assertThat(TestJdbcResultSet.class.getPackage().getImplementationVersion())
                 .isEqualTo(VERSION_UNDER_TEST.get().toString());
