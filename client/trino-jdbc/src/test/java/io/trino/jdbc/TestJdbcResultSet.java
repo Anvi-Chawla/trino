@@ -17,24 +17,29 @@ import io.airlift.log.Logging;
 import io.trino.server.testing.TestingTrinoServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.parallel.Execution;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import static java.lang.String.format;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT;
 
 /**
  * An integration test for JDBC client interacting with Trino server.
  */
+@TestInstance(PER_CLASS)
+@Execution(CONCURRENT)
 public class TestJdbcResultSet
         extends BaseTestJdbcResultSet
 {
     private TestingTrinoServer server;
 
     @BeforeAll
-    void setupServer()
-
+    public void setupServer()
     {
         Logging.initialize();
         server = createTestingServer();
@@ -46,11 +51,13 @@ public class TestJdbcResultSet
     }
 
     @AfterAll
-    void tearDownServer()
+    public void tearDownServer()
             throws Exception
     {
-        server.close();
-        server = null;
+        if (server != null) {
+            server.close();
+            server = null;
+        }
     }
 
     @Override
